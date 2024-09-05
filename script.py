@@ -14,7 +14,7 @@ phase_url = base_url + 'phase'
 heat_url = base_url + 'heat'
 
 # Constants for the competition
-scoresheet_name = "icf"  # Static name to match from the scoresheets
+scoresheet_name = "icf"
 
 number_of_runs = "1"
 number_of_runs_for_score = "1"
@@ -22,13 +22,14 @@ number_of_judges = "2"
 
 spreadsheet_path = 'input.xlsx'
 sheet_name = 'Sheet2'
-# Tracking counters for the report
+
+
 event_count = 0
 phase_count = 0
 heat_count = 0
 paddler_count = 0
 
-# Function to generate a UUID
+
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -36,7 +37,7 @@ def post_competition(competition_data):
     response = requests.post(competition_url, json=competition_data)
     if response.status_code == 201:
         try:
-            return response.json()  # Assuming it returns success data with competition ID
+            return response.json()
         except requests.exceptions.JSONDecodeError:
             print("Failed to decode competition response as JSON")
             print(response.text)
@@ -44,14 +45,14 @@ def post_competition(competition_data):
     else:
         print(f"Failed to add competition: {competition_data}")
         print(f"Response status code: {response.status_code}")
-        print(response.text)  # Print the raw response
+        print(response.text)
         return None
     
 def get_scoresheets():
     response = requests.get(scoresheet_url)
     if response.status_code == 200:
         try:
-            return response.json()  # Returns list of scoresheets
+            return response.json()
         except requests.exceptions.JSONDecodeError:
             print("Failed to decode scoresheets response as JSON")
             print(response.text)
@@ -59,7 +60,7 @@ def get_scoresheets():
     else:
         print(f"Failed to retrieve scoresheets")
         print(f"Response status code: {response.status_code}")
-        print(response.text)  # Print the raw response
+        print(response.text)
         return None
 
 # Function to select the scoresheet by name
@@ -101,7 +102,7 @@ def post_phase(phase_data):
         print(response.text) 
         return None
 
-# Function to post heat data
+
 def post_heat(heat_data):
     response = requests.post(heat_url, json=heat_data)
     if response.status_code == 201:
@@ -117,7 +118,7 @@ def post_heat(heat_data):
         print(response.text) 
         return None
 
-# Function to post athlete data
+
 def post_athlete(athlete_data):
     response = requests.post(athlete_url, json=athlete_data)
     if response.status_code == 201:
@@ -133,7 +134,7 @@ def post_athlete(athlete_data):
         print(response.text)
         return None
 
-# Function to post athlete heat data
+
 def post_athlete_heat(athlete_heat_data):
     response = requests.post(athlete_heat_url, json=athlete_heat_data)
     if response.status_code == 201:
@@ -149,7 +150,7 @@ def post_athlete_heat(athlete_heat_data):
         print(response.text) 
         return None
 
-# Step 0: Create competition (user input)
+
 competition_name = input("Enter the competition name: ")
 competition_id = generate_uuid()
 
@@ -160,7 +161,7 @@ competition_data = [
     }
 ]
 
-# Post competition data
+
 competition_response = post_competition(competition_data)
 
 if competition_response:
@@ -253,7 +254,7 @@ for heat_number in unique_heats:
 for index, row in competitors_df.iterrows():
     athlete_id = generate_uuid()
     
-    # Prepare the athlete data, wrapped in a list
+
     athlete_data = [
         {
             "id": athlete_id,
@@ -263,26 +264,26 @@ for index, row in competitors_df.iterrows():
         }
     ]
     
-    # Post athlete data
+
     if post_athlete(athlete_data):
         paddler_count += 1
         athlete_heat_id = generate_uuid()
         
-        # Get the correct phase_id based on the 'Event' column
+
         phase_id = event_phase_map.get(row['Event'].strip(), None)
         
         if phase_id is None:
             print(f"Event '{row['Event']}' not found in event_phase_map.")
             continue
         
-        # Get the correct heat_id based on the 'Heat' column
+
         heat_id = heat_map.get(row['Heat'], None)
         
         if heat_id is None:
             print(f"Heat '{row['Heat']}' not found in heat_map.")
             continue
         
-        # Prepare the athlete heat data, wrapped in a list
+
         athlete_heat_data = [
             {
                 "id": athlete_heat_id,
@@ -293,10 +294,10 @@ for index, row in competitors_df.iterrows():
             }
         ]
         
-        # Post athlete heat data
+
         post_athlete_heat(athlete_heat_data)
 
-# Final report
+
 print("\n--- Final Report ---")
 print(f"Total Events Added: {event_count}")
 print(f"Total Phases Added: {phase_count}")
