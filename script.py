@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 import uuid
-import time
 
 
 # Set API endpoint URLs
@@ -15,12 +14,14 @@ phase_url = base_url + 'phase'
 heat_url = base_url + 'heat'
 
 # Constants for the competition
-scoresheet_name = "nfl"  # Static name to match from the scoresheets
+scoresheet_name = "icf"  # Static name to match from the scoresheets
 
 number_of_runs = "1"
 number_of_runs_for_score = "1"
-number_of_judges = "1"
+number_of_judges = "2"
 
+spreadsheet_path = 'input.xlsx'
+sheet_name = 'Sheet2'
 # Tracking counters for the report
 event_count = 0
 phase_count = 0
@@ -182,7 +183,7 @@ else:
     print("Failed to retrieve scoresheets")
     exit(1)
 
-competitors_df = pd.read_excel('input.xlsx', sheet_name='Sheet1', dtype={'bib': str})
+competitors_df = pd.read_excel(spreadsheet_path, sheet_name=sheet_name)
 
 unique_events = competitors_df['Event'].unique()
 unique_heats = competitors_df['Heat'].unique()
@@ -294,7 +295,6 @@ for index, row in competitors_df.iterrows():
         
         # Post athlete heat data
         post_athlete_heat(athlete_heat_data)
-        time.sleep(0.2)
 
 # Final report
 print("\n--- Final Report ---")
